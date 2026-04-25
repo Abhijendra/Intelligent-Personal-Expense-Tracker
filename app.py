@@ -1,11 +1,15 @@
 import sqlite3
 import functools
-from flask import Flask, render_template, request, redirect, url_for, session
+from pathlib import Path
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, insert_transactions
+from services.excel_parser import parse_file
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-change-in-prod"
+
+UPLOAD_DIR = Path("data/uploads")
 
 
 def login_required(f):
@@ -16,10 +20,17 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def register(name, email, password):
+    try:
+        user_id = create_user(name, email, generate_password_hash(password))
+    except sqlite3.IntegrityError:
+        return "An account with that email already exists."
+    return f"success: {user_id} created"
 
 with app.app_context():
     init_db()
-    seed_db()
+    # seed_db()
+    register("Abhijendra", "abhijendra.work@outlook.com", "abhijendra")
 
 
 # ------------------------------------------------------------------ #
@@ -98,17 +109,26 @@ def profile():
                            transactions=transactions, categories=categories)
 
 
+@app.route("/upload", methods=["POST"])
+@login_required
+def upload():
+    file = request.files.get("statement")
+    if not file or not file.filename.endswith(".xlsx"):
+        flash("Please upload a valid .xlsx file.", "error")
+        return redirect(url_for("profile"))
+    dest = UPLOAD_DIR / file.filename
+    file.save(dest)
+    rows = parse_file(dest)
+    insert_transactions(rows)
+    flash(f"{len(rows)} transactions imported successfully.", "success")
+    return redirect(url_for("profile"))
+
+
 @app.route("/category/add")
 @login_required
 def add_item_in_category():
     return "Add item"
 
-def register(name, email, password):
-    try:
-        user_id = create_user(name, email, generate_password_hash(password))
-    except sqlite3.IntegrityError:
-        return "An account with that email already exists."
-    return f"success: {user_id} created"
 
 if __name__ == "__main__":
     app.run(debug=True, port=5003)
