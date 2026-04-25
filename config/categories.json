@@ -1,0 +1,192 @@
+{
+  "food": [
+    "food",
+    "groceries",
+    "fruits_vegetables",
+    "dairy_bakery",
+    "dining_out",
+    "coffee_tea",
+    "snacks",
+    "delivery_fees",
+    "zomato",
+    "bhel",
+    "wafer",
+    "egg",
+    "sabji",
+    "sabzi",
+    "fal",
+    "fruits",
+    "chicken",
+    "juice",
+    "aalo",
+    "68082967104944",
+    "aloo",
+    "onion",
+    "papita",
+    "tamatar",
+    "matar",
+    "dinner",
+    "upi-rsmani",
+    "lunch",
+    "paytmqr1m53n1bw1s",
+    "banana"
+  ],
+  "transport": [
+    "fuel",
+    "public_transport",
+    "cab_ride_hailing",
+    "parking",
+    "tolls",
+    "vehicle_service",
+    "rapido",
+    "uber",
+    "irctc uts",
+    "indian railways",
+    "auto",
+    "bike",
+    "ghodake-anandaghodake3-",
+    "cab"
+  ],
+  "housing": [
+    "rent",
+    "maintenance_hoa",
+    "property_tax",
+    "repairs_service",
+    "cleaning",
+    "furnishing",
+    "dry clean"
+  ],
+  "utilities": [
+    "electricity",
+    "water",
+    "gas",
+    "internet_broadband",
+    "mobile_phone",
+    "tv_dth"
+  ],
+  "health": [
+    "noble",
+    "medica",
+    "mask",
+    "dentist",
+    "medicines",
+    "doctor_consultation",
+    "diagnostics_labs",
+    "insurance_health",
+    "fitness_gym",
+    "hospital",
+    "cavity",
+    "q80502333",
+    "tetanus"
+  ],
+  "education": [
+    "books",
+    "courses"
+  ],
+  "family_kids": [
+    "daycare",
+    "events_birthdays"
+  ],
+  "entertainment": [
+    "movies_events",
+    "streaming_subscriptions",
+    "games_apps",
+    "outing",
+    "lavish",
+    "prathameshparalkar8108534576",
+    "m2mferry",
+    "cinelineindialimited"
+  ],
+  "shopping": [
+    "clothing",
+    "footwear",
+    "accessories",
+    "electronics_gadgets",
+    "appliances",
+    "home_decor",
+    "amazon"
+  ],
+  "subscriptions": [
+    "saas_tools",
+    "cloud_ai",
+    "newsletters",
+    "music_video",
+    "storage_backup"
+  ],
+  "personal_care": [
+    "salon_spa",
+    "grooming",
+    "cosmetics",
+    "hygiene",
+    "massage",
+    "haircut",
+    "eyebro"
+  ],
+  "gifts_donations": [
+    "gifts_personal",
+    "charity_donation",
+    "festivals",
+    "donation"
+  ],
+  "finance_fees": [
+    "bank_charges",
+    "late_fees",
+    "interest",
+    "brokerage"
+  ],
+  "travel": [
+    "flights",
+    "hotels",
+    "train_bus",
+    "visa_passport",
+    "local_transport",
+    "food_travel"
+  ],
+  "home": [
+    "household_supplies",
+    "cleaning_supplies",
+    "kitchenware",
+    "small_repairs",
+    "pest_control",
+    "snabbit",
+    "urban company",
+    "blinkit",
+    "zepto",
+    "swiggy",
+    "instamart",
+    "swastik super shoppy",
+    "aayushi super shoppy",
+    "SANGEETAPAGARE",
+    "clothes",
+    "draycline"
+  ],
+  "pet": [
+    "cat food",
+    "vet",
+    "grooming",
+    "supplies",
+    "heads up for tails",
+    "netting"
+  ],
+  "taxes": [
+    "income_tax",
+    "gst",
+    "professional_tax",
+    "filing_fees"
+  ],
+  "investments": [
+    "mutual_funds",
+    "stocks",
+    "fd_rd",
+    "gold",
+    "crypto",
+    "brokerage_fees",
+    "saving",
+    "FD through mobile"
+  ],
+  "misc": [
+    "uncategorized",
+    "rounding",
+    "other"
+  ]
+}
