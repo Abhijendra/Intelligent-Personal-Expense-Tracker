@@ -797,3 +797,31 @@ a { color: inherit; text-decoration: none; }
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
 }
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.pagination-btn {
+    padding: 4px 12px;
+    border: 1px solid var(--border, #ddd);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--primary, #4f46e5);
+    font-size: 0.9rem;
+}
+
+.pagination-btn.disabled {
+    color: #aaa;
+    border-color: #eee;
+    pointer-events: none;
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    color: #666;
+}
