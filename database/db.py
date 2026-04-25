@@ -38,7 +38,30 @@ def init_db():
 
 
 def seed_db():
-    pass 
+    conn = get_db()
+    count = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+    if count > 0:
+        conn.close()
+        return
+
+    rows = [
+        ("2026-04-01", "Salary Credit",   "April salary",         0.0,      85000.00, "Income"),
+        ("2026-04-02", "Big Bazaar",       "Monthly groceries",    3200.00,  0.0,      "Groceries"),
+        ("2026-04-04", "Ola Cabs",         "Airport drop",         650.00,   0.0,      "Transport"),
+        ("2026-04-06", "Airtel",           "Broadband bill",       999.00,   0.0,      "Bills"),
+        ("2026-04-08", "Apollo Pharmacy",  "Medicines",            480.00,   0.0,      "Health"),
+        ("2026-04-10", "Zomato",           "Dinner order",         720.00,   0.0,      "Food"),
+        ("2026-04-14", "Netflix",          "Monthly subscription", 649.00,   0.0,      "Entertainment"),
+        ("2026-04-17", "HDFC Home Loan",   "EMI debit",            22000.00, 0.0,      "Housing"),
+        ("2026-04-20", "Amazon",           "Electronics purchase", 5400.00,  0.0,      "Shopping"),
+        ("2026-04-23", "Cafe Coffee Day",  "Team outing",          1350.00,  0.0,      "Food"),
+    ]
+    conn.executemany(
+        "INSERT INTO transactions (date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) VALUES (?, ?, ?, ?, ?, ?)",
+        rows,
+    )
+    conn.commit()
+    conn.close()
 
 
 def create_user(name, email, password_hash):
