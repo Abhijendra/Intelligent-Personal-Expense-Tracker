@@ -737,3 +737,63 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 520px) {
     .stats-row { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Flash messages                                                      */
+/* ------------------------------------------------------------------ */
+
+.flash-messages {
+    max-width: var(--max-width);
+    margin: 1rem auto 0;
+    padding: 0 1.5rem;
+}
+
+.flash {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.flash--success {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.flash--error {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ------------------------------------------------------------------ */
+/* Upload card                                                         */
+/* ------------------------------------------------------------------ */
+
+.upload-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+}
+
+.upload-form .form-label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+}
+
+.upload-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.upload-row .form-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}

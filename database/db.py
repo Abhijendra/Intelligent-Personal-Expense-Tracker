@@ -30,7 +30,7 @@ def init_db():
             txn_note    TEXT,
             withdraw_amount      REAL    NOT NULL,
             deposit_amount      REAL    NOT NULL,
-            category    TEXT    NOT NULL
+            category    TEXT 
         )
     """)
     conn.commit()
@@ -59,6 +59,20 @@ def seed_db():
     conn.executemany(
         "INSERT INTO transactions (date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) VALUES (?, ?, ?, ?, ?, ?)",
         rows,
+    )
+    conn.commit()
+    conn.close()
+
+
+def insert_transactions(rows):
+    conn = get_db()
+    conn.executemany(
+        "INSERT INTO transactions "
+        "(date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        [(r["date"], r["beneficiary"], r["txn_note"],
+          r["withdraw_amount"], r["deposit_amount"], r["category"])
+         for r in rows],
     )
     conn.commit()
     conn.close()
