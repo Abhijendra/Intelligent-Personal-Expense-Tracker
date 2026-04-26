@@ -1,3 +1,4 @@
+import math
 import sqlite3
 import functools
 from pathlib import Path
@@ -81,32 +82,90 @@ def logout():
 @app.route("/profile")
 @login_required
 def profile():
+    conn = get_db()
+
+    user_row = conn.execute("SELECT * FROM users LIMIT 1").fetchone()
+    if not user_row:
+        conn.close()
+        return redirect(url_for("login"))
+
     user = {
-        "name": "Alex Morgan",
-        "email": "alex@example.com",
-        "joined": "January 2024",
-        "initials": "AM",
+        "name":     user_row["name"],
+        "email":    user_row["email"],
+        "joined":   user_row["created_at"],
+        "initials": "".join(w[0].upper() for w in user_row["name"].split() if w),
     }
+
+    row = conn.execute(
+        "SELECT SUM(withdraw_amount) AS total, COUNT(*) AS cnt FROM transactions"
+    ).fetchone()
+    total_spent       = row["total"] or 0.0
+    transaction_count = row["cnt"]   or 0
+
+    top_row = conn.execute(
+        "SELECT category FROM transactions "
+        "WHERE category != '' AND category IS NOT NULL "
+        "GROUP BY category ORDER BY SUM(withdraw_amount) DESC LIMIT 1"
+    ).fetchone()
+    top_category = top_row["category"] if top_row else "N/A"
+
     stats = {
-        "total_spent": "Rs. 1,284.50",
-        "transaction_count": 18,
-        "top_category": "Groceries",
+        "total_spent":       f"₹{total_spent:,.2f}",
+        "transaction_count": transaction_count,
+        "top_category":      top_category,
     }
+
+    per_page = 6
+    page = max(1, request.args.get("page", 1, type=int))
+    total = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+    total_pages = max(1, math.ceil(total / per_page))
+    page = min(page, total_pages)
+    offset = (page - 1) * per_page
+
+    txn_rows = conn.execute(
+        "SELECT date, txn_note, category, withdraw_amount "
+        "FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?",
+        (per_page, offset),
+    ).fetchall()
+
     transactions = [
-        {"date": "24 Apr 2025", "description": "Tesco Metro",   "category": "Groceries",     "amount": "Rs. 42.30"},
-        {"date": "23 Apr 2025", "description": "Netflix",        "category": "Subscriptions", "amount": "Rs. 17.99"},
-        {"date": "22 Apr 2025", "description": "TfL Top-up",    "category": "Transport",     "amount": "Rs. 20.00"},
-        {"date": "20 Apr 2025", "description": "Pret a Manger", "category": "Eating Out",    "amount": "Rs. 8.75"},
-        {"date": "18 Apr 2025", "description": "Amazon Prime",  "category": "Subscriptions", "amount": "Rs. 8.99"},
+        {
+            "date":        r["date"],
+            "txn_note":    r["txn_note"],
+            "category":    r["category"] or "Uncategorised",
+            "amount":      f"₹{r['withdraw_amount']:,.2f}",
+        }
+        for r in txn_rows
     ]
+
+    pagination = {
+        "page":        page,
+        "total_pages": total_pages,
+        "has_prev":    page > 1,
+        "has_next":    page < total_pages,
+    }
+
+    cat_rows = conn.execute(
+        "SELECT category, SUM(withdraw_amount) AS total "
+        "FROM transactions "
+        "WHERE category != '' AND category IS NOT NULL "
+        "GROUP BY category ORDER BY total DESC LIMIT 5"
+    ).fetchall()
+
+    overall = sum(r["total"] for r in cat_rows)
     categories = [
-        {"name": "Groceries",     "amount": "Rs. 480.20", "pct": 74, "bar_class": "mock-bar"},
-        {"name": "Eating Out",    "amount": "Rs. 230.00", "pct": 56, "bar_class": "mock-bar-2"},
-        {"name": "Transport",     "amount": "Rs. 185.50", "pct": 44, "bar_class": "mock-bar-3"},
-        {"name": "Subscriptions", "amount": "Rs. 388.80", "pct": 60, "bar_class": "mock-bar-4"},
+        {
+            "name":   r["category"],
+            "amount": f"₹{r['total']:,.2f}",
+            "pct":    int(r["total"] / overall * 100) if overall else 0,
+        }
+        for r in cat_rows
     ]
+
+    conn.close()
     return render_template("profile.html", user=user, stats=stats,
-                           transactions=transactions, categories=categories)
+                           transactions=transactions, categories=categories,
+                           pagination=pagination)
 
 
 @app.route("/upload", methods=["POST"])
