@@ -40,6 +40,25 @@
         </form>
     </div>
 
+    <!-- Date range filter -->
+    <div class="filter-bar">
+        <form method="get" action="{{ url_for('profile') }}" class="filter-form">
+            <label class="filter-label" for="start_date">From</label>
+            <input class="form-input filter-input" type="date" name="start_date"
+                   id="start_date" value="{{ start_date }}">
+            <label class="filter-label" for="end_date">To</label>
+            <input class="form-input filter-input" type="date" name="end_date"
+                   id="end_date" value="{{ end_date }}">
+            <button class="btn-primary" type="submit">Apply</button>
+            {% if start_date or end_date %}
+            <a class="filter-clear" href="{{ url_for('profile') }}">Clear</a>
+            {% endif %}
+        </form>
+        {% if start_date or end_date %}
+        <span class="filter-active-label">Showing {{ start_date or '…' }} → {{ end_date or '…' }}</span>
+        {% endif %}
+    </div>
+
     <!-- Two panels side by side -->
     <div class="profile-layout">
 
@@ -69,13 +88,13 @@
             {% if pagination.total_pages > 1 %}
             <div class="pagination">
                 {% if pagination.has_prev %}
-                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page - 1) }}">&#8249; Prev</a>
+                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page - 1, start_date=start_date, end_date=end_date) }}">&#8249; Prev</a>
                 {% else %}
                 <span class="pagination-btn disabled">&#8249; Prev</span>
                 {% endif %}
                 <span class="pagination-info">{{ pagination.page }} / {{ pagination.total_pages }}</span>
                 {% if pagination.has_next %}
-                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page + 1) }}">Next &#8250;</a>
+                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page + 1, start_date=start_date, end_date=end_date) }}">Next &#8250;</a>
                 {% else %}
                 <span class="pagination-btn disabled">Next &#8250;</span>
                 {% endif %}

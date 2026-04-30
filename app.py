@@ -6,6 +6,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, insert_transactions
 from services.excel_parser import parse_file
+import logging
+
+logger = logging.getLogger("root")
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-change-in-prod"
@@ -96,16 +99,31 @@ def profile():
         "initials": "".join(w[0].upper() for w in user_row["name"].split() if w),
     }
 
+    start_date = request.args.get("start_date", "").strip()
+    end_date   = request.args.get("end_date",   "").strip()
+
+    clauses, date_params = [], []
+    if start_date:
+        clauses.append("date >= ?")
+        date_params.append(start_date)
+    if end_date:
+        clauses.append("date <= ?")
+        date_params.append(end_date)
+    date_filter = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+    cat_where = date_filter + (" AND " if date_filter else "WHERE ") + \
+                "category != '' AND category IS NOT NULL"
+
     row = conn.execute(
-        "SELECT SUM(withdraw_amount) AS total, COUNT(*) AS cnt FROM transactions"
+        f"SELECT SUM(withdraw_amount) AS total, COUNT(*) AS cnt FROM transactions {date_filter}",
+        date_params,
     ).fetchone()
     total_spent       = row["total"] or 0.0
     transaction_count = row["cnt"]   or 0
 
     top_row = conn.execute(
-        "SELECT category FROM transactions "
-        "WHERE category != '' AND category IS NOT NULL "
-        "GROUP BY category ORDER BY SUM(withdraw_amount) DESC LIMIT 1"
+        f"SELECT category FROM transactions {cat_where} "
+        "GROUP BY category ORDER BY SUM(withdraw_amount) DESC LIMIT 1",
+        date_params,
     ).fetchone()
     top_category = top_row["category"] if top_row else "N/A"
 
@@ -117,16 +135,20 @@ def profile():
 
     per_page = 6
     page = max(1, request.args.get("page", 1, type=int))
-    total = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+    total = conn.execute(
+        f"SELECT COUNT(*) FROM transactions {date_filter}", date_params
+    ).fetchone()[0]
     total_pages = max(1, math.ceil(total / per_page))
     page = min(page, total_pages)
     offset = (page - 1) * per_page
 
     txn_rows = conn.execute(
-        "SELECT date, txn_note, category, withdraw_amount "
-        "FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?",
-        (per_page, offset),
+        f"SELECT date, txn_note, category, withdraw_amount "
+        f"FROM transactions {date_filter} ORDER BY date DESC LIMIT ? OFFSET ?",
+        date_params + [per_page, offset],
     ).fetchall()
+
+    logger.info(f"Table fetched from DB: {txn_rows}")
 
     transactions = [
         {
@@ -146,10 +168,10 @@ def profile():
     }
 
     cat_rows = conn.execute(
-        "SELECT category, SUM(withdraw_amount) AS total "
-        "FROM transactions "
-        "WHERE category != '' AND category IS NOT NULL "
-        "GROUP BY category ORDER BY total DESC LIMIT 5"
+        f"SELECT category, SUM(withdraw_amount) AS total "
+        f"FROM transactions {cat_where} "
+        "GROUP BY category ORDER BY total DESC LIMIT 5",
+        date_params,
     ).fetchall()
 
     overall = sum(r["total"] for r in cat_rows)
@@ -165,7 +187,8 @@ def profile():
     conn.close()
     return render_template("profile.html", user=user, stats=stats,
                            transactions=transactions, categories=categories,
-                           pagination=pagination)
+                           pagination=pagination,
+                           start_date=start_date, end_date=end_date)
 
 
 @app.route("/upload", methods=["POST"])
