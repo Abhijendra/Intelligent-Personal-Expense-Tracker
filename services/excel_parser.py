@@ -3,6 +3,18 @@ from datetime import datetime
 import openpyxl
 
 
+_DATE_FORMATS = ["%d/%m/%y", "%d/%m/%Y", "%d-%m-%Y", "%d-%m-%y", "%Y-%m-%d"]
+
+
+def _normalise_date(raw: str) -> str:
+    for fmt in _DATE_FORMATS:
+        try:
+            return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return raw  # unknown format — store as-is
+
+
 def find_header_row(ws) -> int:
     for row_idx in range(1, ws.max_row + 1):
         if ws.cell(row_idx, 1).value == "Date":
@@ -47,7 +59,8 @@ def parse_file(file_path: Path) -> list[dict]:
             if isinstance(date_val, datetime):
                 candidate = date_val.strftime("%Y-%m-%d")
             else:
-                candidate = str(date_val).strip()
+                raw = str(date_val).strip()
+                candidate = _normalise_date(raw)
 
             # Skip masked values (e.g. '********' in redacted statements)
             if any(ch.isdigit() for ch in candidate):
