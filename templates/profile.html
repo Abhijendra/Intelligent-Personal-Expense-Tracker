@@ -64,7 +64,12 @@
 
         <!-- Transaction history -->
         <div class="profile-card">
-            <div class="profile-section-title">Transaction History</div>
+            <div class="profile-card-header">
+                <div class="profile-section-title">Transaction History</div>
+                <button id="refresh-btn" class="btn-refresh" title="Refresh" onclick="refreshCategories()">
+                    <span class="refresh-icon">&#x21BB;</span>
+                </button>
+            </div>
             <table class="expense-table">
                 <thead>
                     <tr>

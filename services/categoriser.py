@@ -21,6 +21,26 @@ def _match_keyword(text: str, categories: dict) -> str | None:
     return None
 
 
+def recategorise_all_transactions() -> int:
+    categories = _load_categories()
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, txn_note, beneficiary FROM transactions WHERE withdraw_amount > 0"
+    ).fetchall()
+    conn.close()
+
+    updated = 0
+    for row in rows:
+        category = (
+            _match_keyword(row["txn_note"], categories)
+            or _match_keyword(row["beneficiary"], categories)
+        )
+        if category:
+            update_transaction_category(row["id"], category)
+            updated += 1
+    return updated
+
+
 def categorise_transactions(txn_ids: list[int]) -> None:
     if not txn_ids:
         return

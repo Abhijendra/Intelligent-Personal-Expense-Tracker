@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, insert_transactions
 from services.excel_parser import parse_file
-from services.categoriser import categorise_transactions
+from services.categoriser import categorise_transactions, recategorise_all_transactions
 import logging
 
 logger = logging.getLogger("root")
@@ -206,6 +206,13 @@ def upload():
     categorise_transactions(txn_ids)
     flash(f"{len(rows)} transactions imported successfully.", "success")
     return redirect(url_for("profile"))
+
+
+@app.route("/refresh-categories", methods=["POST"])
+@login_required
+def refresh_categories():
+    updated = recategorise_all_transactions()
+    return {"status": "ok", "updated": updated}
 
 
 @app.route("/category/add")
