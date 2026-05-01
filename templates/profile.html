@@ -121,7 +121,7 @@
                 <div class="mock-bar-row" data-index="{{ loop.index }}">
                     <span class="mock-cat">{{ c.name }}</span>
                     <div class="mock-bar-track">
-                        <div class="mock-bar mock-bar-{{ loop.index }}" style="width: {{ c.pct }}%"></div>
+                        <div class="mock-bar mock-bar-{{ loop.index }}{% if c.is_misc %} bar-misc{% endif %}" style="width: {{ c.pct }}%"></div>
                     </div>
                     <span class="mock-amt">{{ c.amount }}</span>
                 </div>
