@@ -1,6 +1,7 @@
 {
   "food": [
     "food",
+    "popcorn",
     "BRINJAL",
     "papaya",
     "vegetable",
@@ -32,7 +33,12 @@
     "upi-rsmani",
     "lunch",
     "paytmqr1m53n1bw1s",
-    "banana"
+    "banana",
+    "pasta",
+    "capsicum",
+    "DHANIYA",
+    "dosa",
+    "PAANI PURI"
   ],
   "transport": [
     "fuel",
@@ -48,7 +54,8 @@
     "auto",
     "bike",
     "ghodake-anandaghodake3-",
-    "cab"
+    "cab",
+    "metro"
   ],
   "housing": [
     "rent",
@@ -69,6 +76,7 @@
   ],
   "health": [
     "noble",
+    "dawai",
     "medica",
     "mask",
     "dentist",
@@ -80,7 +88,8 @@
     "hospital",
     "cavity",
     "q80502333",
-    "tetanus"
+    "tetanus",
+    "eye drop"
   ],
   "education": [
     "books",
@@ -104,19 +113,18 @@
     "clothing",
     "footwear",
     "accessories",
-    "electronics_gadgets",
     "appliances",
     "home_decor",
     "amazon"
   ],
   "subscriptions": [
     "saas_tools",
-    "cloud_ai",
+    "claude_ai",
     "newsletters",
     "music_video",
     "storage_backup"
   ],
-  "personal_care": [
+  "personal-care": [
     "salon_spa",
     "grooming",
     "cosmetics",
@@ -125,13 +133,14 @@
     "haircut",
     "eyebro"
   ],
-  "gifts_donations": [
+  "gifts": [
     "gifts_personal",
-    "charity_donation",
+    "charity",
     "festivals",
-    "donation"
+    "donation",
+    "gift"
   ],
-  "finance_fees": [
+  "finance-fees": [
     "bank_charges",
     "late_fees",
     "interest",
@@ -161,7 +170,8 @@
     "aayushi super shoppy",
     "SANGEETAPAGARE",
     "clothes",
-    "draycline"
+    "draycline",
+    "Bedsheets"
   ],
   "pet": [
     "cat food",
@@ -169,7 +179,8 @@
     "grooming",
     "supplies",
     "heads up for tails",
-    "netting"
+    "netting",
+    "smylo"
   ],
   "taxes": [
     "income_tax",
@@ -185,11 +196,16 @@
     "crypto",
     "brokerage_fees",
     "saving",
+    "RD",
     "FD through mobile"
   ],
   "misc": [
     "uncategorized",
     "rounding",
     "other"
+  ],
+  "clothing": [
+    "TSHIRT"
+
   ]
 }

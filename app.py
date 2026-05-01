@@ -171,7 +171,7 @@ def profile():
     cat_rows = conn.execute(
         f"SELECT category, SUM(withdraw_amount) AS total "
         f"FROM transactions {cat_where} "
-        "GROUP BY category ORDER BY total DESC LIMIT 5",
+        "GROUP BY category ORDER BY total DESC",
         date_params,
     ).fetchall()
 
