@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+dist/
+build/
+*.min.js
+
+# Secrets & environment
+.env
+.env.*
+secrets/
+
+# Large data files
+*.csv
+*.log
+data/
+
+# Test snapshots
+__snapshots__/
+
+.venv
+__pycache__/
+.db
+.xlsx
+.xls
+data/

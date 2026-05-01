@@ -70,41 +70,32 @@
                     <span class="refresh-icon">&#x21BB;</span>
                 </button>
             </div>
-            <table class="expense-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Txn Note</th>
-                        <th>Category</th>
-                        <th class="amount-cell">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in transactions %}
-                    <tr>
-                        <td>{{ t.date }}</td>
-                        <td>{{ t.txn_note }}</td>
-                        <td><span class="category-badge">{{ t.category }}</span></td>
-                        <td class="amount-cell">{{ t.amount }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% if pagination.total_pages > 1 %}
-            <div class="pagination">
-                {% if pagination.has_prev %}
-                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page - 1, start_date=start_date, end_date=end_date) }}">&#8249; Prev</a>
-                {% else %}
-                <span class="pagination-btn disabled">&#8249; Prev</span>
-                {% endif %}
-                <span class="pagination-info">{{ pagination.page }} / {{ pagination.total_pages }}</span>
-                {% if pagination.has_next %}
-                <a class="pagination-btn" href="{{ url_for('profile', page=pagination.page + 1, start_date=start_date, end_date=end_date) }}">Next &#8250;</a>
-                {% else %}
-                <span class="pagination-btn disabled">Next &#8250;</span>
-                {% endif %}
+            <div class="txn-scroll-area">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Txn Note</th>
+                            <th>Category</th>
+                            <th class="amount-cell">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.date }}</td>
+                            <td>{{ t.txn_note }}</td>
+                            <td><span class="category-badge">{{ t.category }}</span></td>
+                            <td class="amount-cell">{{ t.amount }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="txn-empty">No transactions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% endif %}
         </div>
 
         <!-- Category breakdown -->

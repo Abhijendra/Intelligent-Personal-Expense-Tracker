@@ -1,4 +1,3 @@
-import math
 import sqlite3
 import functools
 from pathlib import Path
@@ -134,19 +133,10 @@ def profile():
         "top_category":      top_category,
     }
 
-    per_page = 6
-    page = max(1, request.args.get("page", 1, type=int))
-    total = conn.execute(
-        f"SELECT COUNT(*) FROM transactions {date_filter}", date_params
-    ).fetchone()[0]
-    total_pages = max(1, math.ceil(total / per_page))
-    page = min(page, total_pages)
-    offset = (page - 1) * per_page
-
     txn_rows = conn.execute(
         f"SELECT date, txn_note, category, withdraw_amount "
-        f"FROM transactions {date_filter} ORDER BY date DESC LIMIT ? OFFSET ?",
-        date_params + [per_page, offset],
+        f"FROM transactions {date_filter} ORDER BY date DESC",
+        date_params,
     ).fetchall()
 
     logger.info(f"Table fetched from DB: {txn_rows}")
@@ -160,13 +150,6 @@ def profile():
         }
         for r in txn_rows
     ]
-
-    pagination = {
-        "page":        page,
-        "total_pages": total_pages,
-        "has_prev":    page > 1,
-        "has_next":    page < total_pages,
-    }
 
     misc_parts = list(clauses) + ["withdraw_amount > 0"]
     misc_where = "WHERE " + " AND ".join(misc_parts)
@@ -200,7 +183,6 @@ def profile():
     conn.close()
     return render_template("profile.html", user=user, stats=stats,
                            transactions=transactions, categories=categories,
-                           pagination=pagination,
                            start_date=start_date, end_date=end_date)
 
 
