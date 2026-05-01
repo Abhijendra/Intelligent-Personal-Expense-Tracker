@@ -168,21 +168,33 @@ def profile():
         "has_next":    page < total_pages,
     }
 
+    misc_parts = list(clauses) + ["withdraw_amount > 0"]
+    misc_where = "WHERE " + " AND ".join(misc_parts)
+
     cat_rows = conn.execute(
-        f"SELECT category, SUM(withdraw_amount) AS total "
-        f"FROM transactions {cat_where} "
-        "GROUP BY category ORDER BY total DESC",
+        f"SELECT COALESCE(category, 'Miscellaneous') AS category, "
+        f"SUM(withdraw_amount) AS total "
+        f"FROM transactions {misc_where} "
+        "GROUP BY COALESCE(category, 'Miscellaneous')",
         date_params,
     ).fetchall()
 
-    overall = sum(r["total"] for r in cat_rows)
+    misc_row = next((r for r in cat_rows if r["category"] == "Miscellaneous"), None)
+    regular  = sorted(
+        [r for r in cat_rows if r["category"] != "Miscellaneous"],
+        key=lambda r: r["total"], reverse=True,
+    )
+    ordered = regular + ([misc_row] if misc_row else [])
+
+    overall = sum(r["total"] for r in ordered)
     categories = [
         {
-            "name":   r["category"],
-            "amount": f"₹{r['total']:,.2f}",
-            "pct":    int(r["total"] / overall * 100) if overall else 0,
+            "name":    r["category"],
+            "amount":  f"₹{r['total']:,.2f}",
+            "pct":     int(r["total"] / overall * 100) if overall else 0,
+            "is_misc": r["category"] == "Miscellaneous",
         }
-        for r in cat_rows
+        for r in ordered
     ]
 
     conn.close()
