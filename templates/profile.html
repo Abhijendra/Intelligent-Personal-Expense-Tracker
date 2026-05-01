@@ -109,10 +109,16 @@
 
         <!-- Category breakdown -->
         <div class="profile-card">
-            <div class="profile-section-title">Spending by Category</div>
-            <div class="mock-bars">
+            <div class="profile-card-header">
+                <div class="profile-section-title">Spending by Category</div>
+                <label class="category-toggle-label">
+                    <input type="checkbox" id="show-all-categories" class="category-toggle-checkbox">
+                    Show all categories
+                </label>
+            </div>
+            <div class="mock-bars" id="mock-bars-container">
                 {% for c in categories %}
-                <div class="mock-bar-row">
+                <div class="mock-bar-row" data-index="{{ loop.index }}">
                     <span class="mock-cat">{{ c.name }}</span>
                     <div class="mock-bar-track">
                         <div class="mock-bar mock-bar-{{ loop.index }}" style="width: {{ c.pct }}%"></div>
