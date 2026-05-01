@@ -23,14 +23,18 @@ def init_db():
             created_at    TEXT    DEFAULT (datetime('now'))
         )
     """)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(transactions)").fetchall()]
+    if cols and "id" not in cols:
+        conn.execute("DROP TABLE transactions")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
-            date        TEXT    NOT NULL,
-            beneficiary TEXT    NOT NULL,
-            txn_note    TEXT,
-            withdraw_amount      REAL    NOT NULL,
-            deposit_amount      REAL    NOT NULL,
-            category    TEXT 
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            date            TEXT    NOT NULL,
+            beneficiary     TEXT    NOT NULL,
+            txn_note        TEXT,
+            withdraw_amount REAL    NOT NULL,
+            deposit_amount  REAL    NOT NULL,
+            category        TEXT
         )
     """)
     conn.commit()
@@ -64,15 +68,28 @@ def seed_db():
     conn.close()
 
 
-def insert_transactions(rows):
+def insert_transactions(rows) -> list[int]:
     conn = get_db()
-    conn.executemany(
-        "INSERT INTO transactions "
-        "(date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) "
-        "VALUES (?, ?, ?, ?, ?, ?)",
-        [(r["date"], r["beneficiary"], r["txn_note"],
-          r["withdraw_amount"], r["deposit_amount"], r["category"])
-         for r in rows],
+    ids = []
+    for r in rows:
+        cursor = conn.execute(
+            "INSERT INTO transactions "
+            "(date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (r["date"], r["beneficiary"], r["txn_note"],
+             r["withdraw_amount"], r["deposit_amount"], r["category"]),
+        )
+        ids.append(cursor.lastrowid)
+    conn.commit()
+    conn.close()
+    return ids
+
+
+def update_transaction_category(txn_id: int, category: str) -> None:
+    conn = get_db()
+    conn.execute(
+        "UPDATE transactions SET category = ? WHERE id = ?",
+        (category, txn_id),
     )
     conn.commit()
     conn.close()
