@@ -25,18 +25,10 @@ function refreshCategories() {
 
 function applyToggle(showAll) {
     var rows = document.querySelectorAll('.mock-bar-row');
-    var container = document.getElementById('mock-bars-container');
     rows.forEach(function(row) {
         var idx = parseInt(row.getAttribute('data-index'), 10);
         row.style.display = (!showAll && idx > 5) ? 'none' : '';
     });
-    if (container) {
-        if (showAll && rows.length > 5) {
-            container.classList.add('mock-bars--overflow');
-        } else {
-            container.classList.remove('mock-bars--overflow');
-        }
-    }
 }
 
 function initCategoryToggle() {
