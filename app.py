@@ -208,12 +208,17 @@ def profile():
 @login_required
 def upload():
     file = request.files.get("statement")
-    if not file or not file.filename.endswith(".xlsx"):
-        flash("Please upload a valid .xlsx file.", "error")
+    suffix = Path(file.filename).suffix.lower() if file else ""
+    if suffix not in (".xls", ".xlsx"):
+        flash("Please upload a valid Excel file (.xls or .xlsx).", "error")
         return redirect(url_for("profile"))
     dest = UPLOAD_DIR / file.filename
     file.save(dest)
-    rows = parse_file(dest)
+    try:
+        rows = parse_file(dest)
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("profile"))
     txn_ids = insert_transactions(rows)
     categorise_transactions(txn_ids)
     flash(f"{len(rows)} transactions imported successfully.", "success")

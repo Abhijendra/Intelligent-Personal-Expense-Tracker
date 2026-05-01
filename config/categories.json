@@ -1,5 +1,6 @@
 {
   "food": [
+    "breakfast",
     "food",
     "popcorn",
     "BRINJAL",
@@ -38,10 +39,28 @@
     "capsicum",
     "DHANIYA",
     "dosa",
-    "PAANI PURI"
+    "PAANI PURI",
+    "PANI PURI",
+    "fruit",
+    "snack",
+    "COLD DRINK",
+    "Apple",
+    "Maggi",
+    "CHIPS",
+    "BISCUIT",
+    "JOWAR FLOUR",
+    "paneer",
+    "SANGEETA SANJAY DHER",
+    "Mango",
+    "Ration",
+    "DELHI SE",
+    "FOO POWAI",
+    "kela",
+    "CHEMBUR SOCIAL",
+    "COFFEE"
   ],
   "transport": [
-    "fuel",
+    "PETROL",
     "public_transport",
     "cab_ride_hailing",
     "parking",
@@ -55,16 +74,13 @@
     "bike",
     "ghodake-anandaghodake3-",
     "cab",
-    "metro"
-  ],
-  "housing": [
-    "rent",
-    "maintenance_hoa",
-    "property_tax",
-    "repairs_service",
-    "cleaning",
-    "furnishing",
-    "dry clean"
+    "metro",
+    "easebuzz",
+    "M2M",
+    "SPEED BOAT",
+    "scooty",
+    "MAKEMYTRIP",
+    "IRCTC"
   ],
   "utilities": [
     "electricity",
@@ -72,7 +88,12 @@
     "gas",
     "internet_broadband",
     "mobile_phone",
-    "tv_dth"
+    "tv_dth",
+    "CYLINDER DELIVERY",
+    "wifi",
+    "recharge",
+    "WASHING MACHINE RE",
+    "AC REPAIRING"
   ],
   "health": [
     "noble",
@@ -89,7 +110,11 @@
     "cavity",
     "q80502333",
     "tetanus",
-    "eye drop"
+    "eye drop",
+    "doctor",
+    "healthcare",
+    "PARACETAMOL",
+    "APOLLO"
   ],
   "education": [
     "books",
@@ -107,7 +132,10 @@
     "lavish",
     "prathameshparalkar8108534576",
     "m2mferry",
-    "cinelineindialimited"
+    "cinelineindialimited",
+    "bookmyshow",
+    "PARTY",
+    "ENTERTAINMENT"
   ],
   "shopping": [
     "clothing",
@@ -131,7 +159,10 @@
     "hygiene",
     "massage",
     "haircut",
-    "eyebro"
+    "eyebro",
+    "FOXTALE",
+    "PLUMGOODNESS",
+    "VASELINE"
   ],
   "gifts": [
     "gifts_personal",
@@ -155,6 +186,14 @@
     "food_travel"
   ],
   "home": [
+    "rent",
+    "maintenance_hoa",
+    "property_tax",
+    "repairs_service",
+    "cleaning",
+    "furnishing",
+    "dry clean",    
+    "draycline",
     "household_supplies",
     "cleaning_supplies",
     "kitchenware",
@@ -170,7 +209,6 @@
     "aayushi super shoppy",
     "SANGEETAPAGARE",
     "clothes",
-    "draycline",
     "Bedsheets"
   ],
   "pet": [
@@ -180,7 +218,8 @@
     "supplies",
     "heads up for tails",
     "netting",
-    "smylo"
+    "smylo",
+    "pet"
   ],
   "taxes": [
     "income_tax",
@@ -205,7 +244,8 @@
     "other"
   ],
   "clothing": [
-    "TSHIRT"
+    "TSHIRT",
+    "westside"
 
   ]
 }
