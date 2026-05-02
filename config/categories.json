@@ -30,6 +30,7 @@
     "papita",
     "tamatar",
     "matar",
+    "KITABUDDIN  FEKU",
     "dinner",
     "upi-rsmani",
     "lunch",
@@ -62,26 +63,35 @@
   "transport": [
     "PETROL",
     "public_transport",
-    "cab_ride_hailing",
     "parking",
     "tolls",
     "vehicle_service",
     "rapido",
     "uber",
     "irctc uts",
-    "indian railways",
     "auto",
     "bike",
     "ghodake-anandaghodake3-",
     "cab",
-    "metro",
-    "easebuzz",
+    "metro"
+  ],
+  "travel": [
+    "flights",
+    "hotels",
+    "train_bus",
+    "visa_passport",
+    "local_transport",
+    "food_travel",
+    "INDIGO",
+    "GOIBIBO",
+    "ease my trip",
     "M2M",
     "SPEED BOAT",
     "scooty",
     "MAKEMYTRIP",
-    "IRCTC"
-  ],
+    "IRCTC",
+    "indian railways"      
+  ],  
   "utilities": [
     "electricity",
     "water",
@@ -92,6 +102,7 @@
     "CYLINDER DELIVERY",
     "wifi",
     "recharge",
+    "MYJIO",
     "WASHING MACHINE RE",
     "AC REPAIRING"
   ],
@@ -118,7 +129,8 @@
   ],
   "education": [
     "books",
-    "courses"
+    "courses",
+    "notebook"
   ],
   "family_kids": [
     "daycare",
@@ -177,14 +189,6 @@
     "interest",
     "brokerage"
   ],
-  "travel": [
-    "flights",
-    "hotels",
-    "train_bus",
-    "visa_passport",
-    "local_transport",
-    "food_travel"
-  ],
   "home": [
     "rent",
     "maintenance_hoa",
@@ -200,7 +204,7 @@
     "small_repairs",
     "pest_control",
     "snabbit",
-    "urban company",
+    "URBANCOMPANY",
     "blinkit",
     "zepto",
     "swiggy",
@@ -237,11 +241,6 @@
     "saving",
     "RD",
     "FD through mobile"
-  ],
-  "misc": [
-    "uncategorized",
-    "rounding",
-    "other"
   ],
   "clothing": [
     "TSHIRT",

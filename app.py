@@ -1,13 +1,17 @@
 import sqlite3
 import functools
 from pathlib import Path
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+
+load_dotenv()
 from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, insert_transactions
 from services.excel_parser import parse_file
 from services.categoriser import categorise_transactions, recategorise_all_transactions
 import logging
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger("root")
 
 app = Flask(__name__)
@@ -139,7 +143,6 @@ def profile():
         date_params,
     ).fetchall()
 
-    logger.info(f"Table fetched from DB: {txn_rows}")
 
     transactions = [
         {
