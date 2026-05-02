@@ -5,3 +5,4 @@ __pycache__/
 .xls
 data/
 .env
+config/categories.json
