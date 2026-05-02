@@ -4,7 +4,7 @@ This document provides guidance for Claude Code when working within this reposit
 
 ---
 
-## 🚀 Commands
+## Commands
 
 ```bash
 # Run the app (port 5003)
@@ -20,160 +20,175 @@ source .venv/bin/activate && pytest tests/test_foo.py
 pip install -r requirements.txt
 ```
 
-> The application automatically initializes and seeds the SQLite database (`spendly.db`) on startup using `init_db()` and `seed_db()` within an `app_context` block in `app.py`.
+> The application automatically initializes the SQLite database (`data/app.db`) on startup via `init_db()` inside an `app_context` block in `app.py`. `seed_db()` is currently commented out.
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
-This is a **Flask + SQLite-based personal expense tracker** that enables users to manage expenses by uploading bank statement Excel files.
+**Spendly** is a Flask + SQLite personal expense tracker. Users upload bank statement Excel files to track and categorize spending.
 
 ### Core Workflow
 
-* User uploads a bank statement (`.xlsx`)
-* The application:
-
-  * Parses the file
-  * Inserts transactions into the database
-  * Categorizes each transaction
+1. User uploads a bank statement (`.xls` or `.xlsx`)
+2. `excel_parser.py` parses the file into rows
+3. Rows are inserted into the `transactions` table (duplicates skipped via `UNIQUE` constraint)
+4. `categoriser.py` assigns categories using keyword matching, then LLM fallback
 
 ### Categorization Logic
 
-1. **Primary method**: Keyword-based matching using `config/categories.json`
-2. **Fallback**: LLM-based categorization using:
+1. **Primary**: keyword matching against `config/categories.json` (category → list of keywords)
+2. **Fallback**: LLM via OpenAI API — uses `txn_note` + `beneficiary` to infer category
+   - Returns `SKIP` for peer-to-peer transfers (e.g. "PAYMENT FROM PHONE" to a human name)
+   - Includes retry logic if an invalid SKIP is returned
+   - Inferred categories must already exist in `categories.json` (no new categories are added at runtime)
 
-   * Beneficiary
-   * Transaction note
+### Category Management
 
-If a new category is inferred via LLM:
-
-* It is added to `categories.json`
-* Future transactions avoid repeated LLM calls
-
-### Additional Features
-
-* Users can **view and edit `categories.json` directly from the UI**
-* Updating a category triggers:
-
-  * Re-categorization of relevant transactions
-  * Update of the `category` column in the `transactions` table
-  * Do not expose the raw `categories.json` file for direct editing. Instead, provide a well-designed UI that enables users to view and modify categories with a smooth and intuitive user experience.
+- Users can view and edit `categories.json` via the UI (not direct file exposure)
+- Editing a category triggers re-categorization of all transactions via `/refresh-categories`
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-* **Python Version**: 3.12
-* **Environment**: Virtual environment at `.venv/`
+- **Python**: 3.12
+- **Environment**: `.venv/`
+- **Database**: SQLite at `data/app.db` (raw `sqlite3`, no ORM)
+- **LLM**: OpenAI API (`OPENAI_API_KEY`, `OPENAI_MODEL` env vars via `.env`)
 
-### High-Level Flow
-
-```
-User → Uploads statement.xlsx
-     → excel_parser.py parses file
-     → Transactions inserted into DB
-     → categoriser assigns categories
-     → Last 15 transactions displayed on UI
-```
-
-### Category Update Flow
+### File Structure
 
 ```
-User → Edits categories.json via UI
-     → Triggers re-categorization
-     → Updates all transactions in DB
+app.py                        # Flask app, routes, startup
+config/categories.json        # category → [keywords] mapping
+database/
+  db.py                       # get_db, init_db, seed_db, insert_transactions, update_transaction_category
+services/
+  excel_parser.py             # parse_file() — supports .xlsx (openpyxl) and .xls (xlrd)
+  categoriser.py              # categorise_transactions(), recategorise_all_transactions(), llm_categorise_transactions()
+templates/
+  base.html                   # base layout with navbar and footer
+  landing.html, login.html, profile.html, privacy.html, terms.html
+static/
+  css/style.css, css/landing.css
+  js/main.js
+data/
+  app.db                      # SQLite database
+  uploads/                    # uploaded Excel files
+tests/
+  conftest.py
+  test_categoriser.py
 ```
 
----
-
-## 🔁 Request Flow
+### Request Flow
 
 ```
-app.py → Route Handler → database/db.py → SQLite (app.db)
+app.py → Route Handler → database/db.py → SQLite (data/app.db)
 ```
-
-* All database operations use raw `sqlite3`
-* Connections are managed via `get_db()` in `database/db.py`
-* **No ORM is used**
 
 ### Database Schema
 
-**Tables:**
+**`users`**
 
-* `users`
-* `transactions`
-  Fields:
+| Column        | Type    |
+|---------------|---------|
+| id            | INTEGER PK AUTOINCREMENT |
+| name          | TEXT    |
+| email         | TEXT UNIQUE |
+| password_hash | TEXT    |
+| created_at    | TEXT    |
 
-  * `date`
-  * `beneficiary`
-  * `txn_note`
-  * `withdrawal_amount`
-  * `deposit_amount`
-  * `category`
+**`transactions`**
 
----
+| Column         | Type    |
+|----------------|---------|
+| id             | INTEGER PK AUTOINCREMENT |
+| date           | TEXT    |
+| beneficiary    | TEXT    |
+| txn_note       | TEXT    |
+| withdraw_amount| REAL    |
+| deposit_amount | REAL    |
+| category       | TEXT    |
 
-## 🧠 Services Layer (Planned)
+Duplicate detection: `UNIQUE(date, beneficiary, txn_note, withdraw_amount, deposit_amount)`
 
-The following modules are currently placeholders:
-
-* `services/categoriser.py` → AI-based categorization
-* `services/excel_parser.py` → Excel ingestion logic
-
-### Configuration
-
-* `config/categories.json`
-
-  * Maps **category → list of keywords**
-  * Used for rule-based categorization
+> Note: The column is `withdraw_amount` (not `withdrawal_amount` as in earlier docs).
 
 ---
 
-## 🎨 Templates & Static Assets
+## Routes
 
-* All templates extend: `templates/base.html`
+| Method | Path                  | Auth | Description                                  |
+|--------|-----------------------|------|----------------------------------------------|
+| GET    | `/`                   | No   | Landing page                                 |
+| GET    | `/login`              | No   | Login form                                   |
+| POST   | `/login`              | No   | Authenticate user                            |
+| GET    | `/logout`             | Yes  | Clear session, redirect to landing           |
+| GET    | `/profile`            | Yes  | Dashboard: stats, transactions, categories   |
+| POST   | `/upload`             | Yes  | Upload `.xls`/`.xlsx`, parse, insert, categorize |
+| POST   | `/refresh-categories` | Yes  | Re-run keyword categorization on all transactions |
+| GET    | `/terms`              | No   | Terms of service                             |
+| GET    | `/privacy`            | No   | Privacy policy                               |
+| GET    | `/category/add`       | Yes  | Placeholder — not yet implemented            |
 
-  * Includes navbar (session-aware), footer, and global assets
+### Profile Page Features
 
-**Static Files:**
-
-* `static/css/style.css`
-* `static/js/main.js`
-* `static/css/landing.css` (used by landing page)
-
----
-
-## 🚧 Work in Progress
-
-* `/profile` route currently returns mock data → needs DB integration
-* `/category/add` returns placeholder responses → planned for future category management
-
----
-
-## 🔐 Demo Credentials
-
-* **Email**: `demo@spendly.com`
-* **Password**: `demo123`
-
-> These credentials are automatically seeded if the `users` table is empty.
-
-### Note
-
-* No public registration feature will be implemented
-* Developer-only backdoor registration may exist for internal use
+- Summary stats: total spent, transaction count, top category
+- Date range filter (`start_date`, `end_date` query params)
+- Full transaction list (all matching transactions, newest first)
+- Category breakdown with spend percentages; `Miscellaneous` always shown last
 
 ---
 
-## 🧹 Code Style Guidelines
+## Auth & Users
 
-* Write **modular and maintainable code**
-* Prioritize **clarity and readability**
-* Keep the codebase **beginner-friendly**
+- `login_required` decorator redirects unauthenticated users to `/login`
+- No public registration; users are created via the `register()` helper in `app.py`
+- A hardcoded developer user (`abhijendra.work@outlook.com`) is registered on startup (silently ignored if already exists)
+- Demo credentials (seeded when `users` table is empty — currently `seed_db()` is commented out):
+  - **Email**: `demo@spendly.com`
+  - **Password**: `demo123`
+
+---
+
+## Excel Parsing
+
+`services/excel_parser.py` → `parse_file(path)` dispatches to:
+
+- `_parse_xlsx()` — uses `openpyxl`
+- `_parse_xls()` — uses `xlrd`
+
+Both parsers:
+- Locate the header row by scanning for a `"Date"` cell in column 1
+- Parse `Narration` field: UPI narrations (`UPI-<beneficiary>@...-<note>`) are split into `beneficiary` + `txn_note`
+- Skip rows with zero withdrawal and zero deposit
+- Normalize dates to `YYYY-MM-DD`
 
 ---
 
-## 📚 Preferred Libraries
+## Code Style Guidelines
 
-* Use `pathlib` for file system and path operations instead of `os`
+- Write modular and maintainable code
+- Prioritize clarity and readability; keep the codebase beginner-friendly
+- Use `pathlib` for all file system and path operations (not `os`)
+- No ORM — use raw `sqlite3` throughout
+- Templates all extend `templates/base.html`
 
 ---
+
+## Dependencies
+
+See `requirements.txt`:
+
+- `flask`, `werkzeug` — web framework and security
+- `openpyxl`, `xlrd>=2.0` — Excel parsing
+- `openai` — LLM categorization fallback
+- `python-dotenv` — `.env` loading
+- `pytest`, `pytest-flask` — testing
+
+---
+
+## Work in Progress
+
+- `/category/add` returns a placeholder string — category add/edit UI is not yet implemented

@@ -711,7 +711,7 @@ a { color: inherit; text-decoration: none; }
 .expense-table tr:last-child td { border-bottom: none; }
 
 .txn-scroll-area {
-    max-height: 500px;
+    max-height: 620px;
     overflow-y: auto;
 }
 
