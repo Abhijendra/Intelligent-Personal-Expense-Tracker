@@ -10,12 +10,13 @@ from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
 from services.excel_parser import parse_file
 from services.categoriser import categorise_transactions, recategorise_all_transactions
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger("root")
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-change-in-prod"
+app.secret_key = os.environ.get("SECRET_KEY") or "dev-secret-change-in-prod" 
 
 UPLOAD_DIR = Path("data/uploads")
 
@@ -38,7 +39,11 @@ def register(name, email, password):
 with app.app_context():
     init_db()
     # seed_db()
-    register("Abhijendra", "abhijendra.work@outlook.com", "abhijendra")
+    dev_username = os.environ.get("DEV_USER_NAME")
+    dev_email = os.environ.get("DEV_USER_EMAIL")
+    dev_password = os.environ.get("DEV_USER_PASSWORD")
+    if dev_email and dev_password:
+        register(dev_username or "Dev", dev_email, dev_password)
 
 
 # ------------------------------------------------------------------ #
@@ -228,4 +233,3 @@ def add_item_in_category():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5003)
-    # print(register("Abhijendra", "abhijendra.work@outlook.com", "abhijendra"))
