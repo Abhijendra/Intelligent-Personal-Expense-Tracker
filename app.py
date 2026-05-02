@@ -201,9 +201,12 @@ def upload():
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("profile"))
-    txn_ids = insert_transactions(rows)
-    categorise_transactions(txn_ids)
-    flash(f"{len(rows)} transactions imported successfully.", "success")
+    result = insert_transactions(rows)
+    categorise_transactions(result["ids"])
+    if result["skipped"]:
+        flash(f"{result['inserted']} transactions imported. {result['skipped']} duplicates skipped.", "success")
+    else:
+        flash(f"{result['inserted']} transactions imported successfully.", "success")
     return redirect(url_for("profile"))
 
 

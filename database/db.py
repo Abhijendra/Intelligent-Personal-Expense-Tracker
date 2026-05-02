@@ -23,18 +23,53 @@ def init_db():
             created_at    TEXT    DEFAULT (datetime('now'))
         )
     """)
-    cols = [r[1] for r in conn.execute("PRAGMA table_info(transactions)").fetchall()]
-    if cols and "id" not in cols:
-        conn.execute("DROP TABLE transactions")
+
+    table_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='transactions'"
+    ).fetchone() is not None
+
+    if table_exists:
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(transactions)").fetchall()]
+        if cols and "id" not in cols:
+            conn.execute("DROP TABLE transactions")
+            table_exists = False
+
+    if table_exists:
+        indices = conn.execute("PRAGMA index_list(transactions)").fetchall()
+        has_unique_constraint = any(idx["origin"] == "u" for idx in indices)
+        if not has_unique_constraint:
+            conn.execute("""
+                CREATE TABLE transactions_new (
+                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date            TEXT    NOT NULL,
+                    beneficiary     TEXT    NOT NULL,
+                    txn_note        TEXT    NOT NULL DEFAULT '',
+                    withdraw_amount REAL    NOT NULL,
+                    deposit_amount  REAL    NOT NULL,
+                    category        TEXT,
+                    UNIQUE(date, beneficiary, txn_note, withdraw_amount, deposit_amount)
+                )
+            """)
+            conn.execute("""
+                INSERT OR IGNORE INTO transactions_new
+                    (id, date, beneficiary, txn_note, withdraw_amount, deposit_amount, category)
+                SELECT id, date, beneficiary, COALESCE(txn_note, ''),
+                       withdraw_amount, deposit_amount, category
+                FROM transactions
+            """)
+            conn.execute("DROP TABLE transactions")
+            conn.execute("ALTER TABLE transactions_new RENAME TO transactions")
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             date            TEXT    NOT NULL,
             beneficiary     TEXT    NOT NULL,
-            txn_note        TEXT,
+            txn_note        TEXT    NOT NULL DEFAULT '',
             withdraw_amount REAL    NOT NULL,
             deposit_amount  REAL    NOT NULL,
-            category        TEXT
+            category        TEXT,
+            UNIQUE(date, beneficiary, txn_note, withdraw_amount, deposit_amount)
         )
     """)
     conn.commit()
@@ -68,21 +103,25 @@ def seed_db():
     conn.close()
 
 
-def insert_transactions(rows) -> list[int]:
+def insert_transactions(rows) -> dict:
     conn = get_db()
-    ids = []
+    inserted, skipped, ids = 0, 0, []
     for r in rows:
         cursor = conn.execute(
-            "INSERT INTO transactions "
+            "INSERT OR IGNORE INTO transactions "
             "(date, beneficiary, txn_note, withdraw_amount, deposit_amount, category) "
             "VALUES (?, ?, ?, ?, ?, ?)",
-            (r["date"], r["beneficiary"], r["txn_note"],
+            (r["date"], r["beneficiary"], r["txn_note"] or "",
              r["withdraw_amount"], r["deposit_amount"], r["category"]),
         )
-        ids.append(cursor.lastrowid)
+        if cursor.lastrowid:
+            inserted += 1
+            ids.append(cursor.lastrowid)
+        else:
+            skipped += 1
     conn.commit()
     conn.close()
-    return ids
+    return {"inserted": inserted, "skipped": skipped, "ids": ids}
 
 
 def update_transaction_category(txn_id: int, category: str) -> None:
