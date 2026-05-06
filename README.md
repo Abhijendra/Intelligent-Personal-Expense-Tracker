@@ -121,3 +121,5 @@ pytest
 | LLM | OpenAI API |
 | Auth | Werkzeug password hashing |
 | Testing | pytest, pytest-flask |
+
+Frontend credit: CampusX YouTube channel
