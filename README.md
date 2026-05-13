@@ -1,4 +1,4 @@
-# Spendly - An AI based personal expense tracker
+# Intelligent Personal Expense Tracker
 
 A personal expense tracker built with Flask and SQLite. Upload your bank statement and Spendly automatically categorizes your transactions — using keyword rules first, then an OpenAI LLM as a fallback.
 
