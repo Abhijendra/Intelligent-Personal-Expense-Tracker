@@ -122,4 +122,4 @@ pytest
 | Auth | Werkzeug password hashing |
 | Testing | pytest, pytest-flask |
 
-Frontend credit: CampusX YouTube channel
+Frontend inspired from CampusX YouTube channel
